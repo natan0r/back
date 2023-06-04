@@ -48,6 +48,19 @@ app.post("/", async function (req, res) {
   res.json(newUserCliente);
 });
 
+//POST LOGIN
+app.post("/login", async function (req, res) {
+  const { email, senha } = req.body;
+
+  const newUserCliente = await prisma.userCliente.findFirst({
+    where: {
+      email,
+      senha,
+    },
+  });
+  res.json(newUserCliente);
+});
+
 //=================================================================
 //PUT
 app.put("/:id", async function (req, res) {
