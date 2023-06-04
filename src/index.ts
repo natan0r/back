@@ -8,11 +8,18 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-//GET
+//GET CLIENTE
 app.get("/", async function (req, res) {
   const userClientes = await prisma.userCliente.findMany();
 
   res.json(userClientes);
+});
+
+//GET EMPRESA
+app.get("/empresa", async function (req, res) {
+  const userEmpresas = await prisma.userEmpresa.findMany();
+
+  res.json(userEmpresas);
 });
 
 //=======================================================================
@@ -48,6 +55,34 @@ app.post("/", async function (req, res) {
   res.json(newUserCliente);
 });
 
+// POST EMPRESA
+app.post("/empresa", async function (req, res) {
+  const {
+    nomeEmpresa,
+    endereco,
+    periodo,
+    horario,
+    tipoServico,
+    numero,
+    email,
+    senha,
+  } = req.body;
+
+  const newUserEmpresa = await prisma.userEmpresa.create({
+    data: {
+      nomeEmpresa,
+      endereco,
+      periodo,
+      horario,
+      tipoServico,
+      numero: Number(numero),
+      email,
+      senha,
+    },
+  });
+  res.json(newUserEmpresa);
+});
+
 //POST LOGIN
 app.post("/login", async function (req, res) {
   const { email, senha } = req.body;
@@ -58,7 +93,14 @@ app.post("/login", async function (req, res) {
       senha,
     },
   });
-  res.json(newUserCliente);
+
+  const newUserEmpresa = await prisma.userEmpresa.findFirst({
+    where: {
+      email,
+      senha,
+    },
+  });
+  res.json(newUserCliente || newUserEmpresa);
 });
 
 //=================================================================
@@ -99,12 +141,56 @@ app.put("/:id", async function (req, res) {
   res.json(updatedUserCliente);
 });
 
+//POST EMPRESA
+app.put("/empresa/:id", async function (req, res) {
+  const { id } = req.params;
+  const {
+    nomeEmpresa,
+    endereco,
+    periodo,
+    horario,
+    tipoServico,
+    numero,
+    email,
+    senha,
+  } = req.body;
+
+  const updatedUserEmpresa = await prisma.userEmpresa.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      nomeEmpresa,
+      endereco,
+      periodo,
+      horario,
+      tipoServico,
+      numero: Number(numero),
+      email,
+      senha,
+    },
+  });
+  res.json(updatedUserEmpresa);
+});
+
 //====================================================================
 //DELETE
 app.delete("/:id", async function (req, res) {
   const { id } = req.params;
 
   await prisma.userCliente.delete({
+    where: {
+      id: Number(id),
+    },
+  });
+  res.json();
+});
+
+//DELETE EMPRESA
+app.delete("/empresa/:id", async function (req, res) {
+  const { id } = req.params;
+
+  await prisma.userEmpresa.delete({
     where: {
       id: Number(id),
     },
