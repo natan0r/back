@@ -222,6 +222,81 @@ app.delete("/empresa", async function (req, res) {
   res.json({ message: "EMPRESA DELETADA COM SUCESSO!" });
 });
 
+//GET RESERVA
+
+app.get("/reservas", async function (req, res) {
+  const reservas = await prisma.reserva.findMany();
+  res.status(200).json(reservas);
+});
+
+// POST RESERVA
+
+app.post("/reservas", async function (req, res) {
+  const { dataHora, telefone, userClienteId, userEmpresaId } = req.body;
+  if (!dataHora || !telefone || !userClienteId || !userEmpresaId) {
+    return res.status(400).json({
+      message: "Campo Obrigatório",
+    });
+  }
+  const reservaCriada = await prisma.reserva.create({
+    data: {
+      dataHora,
+      telefone,
+      userClienteId,
+      userEmpresaId,
+    },
+  });
+  res.status(201).json(reservaCriada);
+});
+
+// PUT RESERVA
+
+app.put("/reserva/:id", async function (req, res) {
+  const { id } = req.params;
+  const { dataHora, telefone, userClienteId, userEmpresaId } = req.body;
+  if (!dataHora || !telefone || !userClienteId || !userEmpresaId) {
+    return res.status(400).json({
+      message: "Campo Obrigatório",
+    });
+  }
+  const reservaAtualizada = await prisma.reserva.update({
+    where: {
+      id: Number(id),
+    },
+    data: {
+      dataHora,
+      telefone,
+      userClienteId,
+      userEmpresaId,
+    },
+  });
+
+  res.status(200).json(reservaAtualizada);
+});
+
+// DELETE RESERVA
+
+app.delete("/reservas/:id", async function (req, res) {
+  const { id } = req.params;
+
+  const reservaEncontrada = await prisma.reserva.findUnique({
+    where: {
+      id: Number(id),
+    },
+  });
+  if (!reservaEncontrada) {
+    return res.status(404).json({
+      message: "Reserva não encontrada",
+    });
+  }
+  await prisma.reserva.delete({
+    where: {
+      id: Number(id),
+    },
+  });
+  res.status(204).json();
+});
+
 app.listen(8081, function () {
   console.log("Servidor abriu");
 });

@@ -22,6 +22,8 @@ model UserCliente {
   estado         String
   email          String   @unique
   senha          String
+
+  reservas Reserva[]
 }
 
 model UserEmpresa {
@@ -34,4 +36,17 @@ model UserEmpresa {
   numero      Int
   email       String @unique
   senha       String
+
+  reservas Reserva[]
+}
+
+model Reserva {
+  id            Int      @id @default(autoincrement())
+  dataHora      DateTime
+  telefone      String
+  userClienteId Int
+  userEmpresaId Int
+
+  userCliente UserCliente @relation(fields: [userClienteId], references: [id])
+  userEmpresa UserEmpresa @relation(fields: [userEmpresaId], references: [id])
 }
