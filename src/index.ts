@@ -174,28 +174,52 @@ app.put("/empresa/:id", async function (req, res) {
 });
 
 //====================================================================
-//DELETE
-app.delete("/:id", async function (req, res) {
-  const { id } = req.params;
+//DELETE CLIENTE
+app.delete("/cliente", async function (req, res) {
+  const { email, senha } = req.body;
+
+  const cliente = await prisma.userCliente.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (!cliente) {
+    return res.status(404).json({ message: "Usuário não encontrado." });
+  }
+  if (senha !== cliente.senha) {
+    return res.status(401).json({ message: "Email ou senha inválida!" });
+  }
 
   await prisma.userCliente.delete({
     where: {
-      id: Number(id),
+      id: Number(cliente.id),
     },
   });
-  res.json();
+  res.json({ message: "USUÁRIO DELETADO COM SUCESSO!" });
 });
 
 //DELETE EMPRESA
-app.delete("/empresa/:id", async function (req, res) {
-  const { id } = req.params;
+app.delete("/empresa", async function (req, res) {
+  const { email, senha } = req.body;
+
+  const empresa = await prisma.userEmpresa.findUnique({
+    where: {
+      email: email,
+    },
+  });
+  if (!empresa) {
+    return res.status(404).json({ message: "Empresa não encontrado." });
+  }
+  if (senha !== empresa.senha) {
+    return res.status(401).json({ message: "Email ou senha inválida!" });
+  }
 
   await prisma.userEmpresa.delete({
     where: {
-      id: Number(id),
+      id: Number(empresa.id),
     },
   });
-  res.json();
+  res.json({ message: "EMPRESA DELETADA COM SUCESSO!" });
 });
 
 app.listen(8081, function () {
