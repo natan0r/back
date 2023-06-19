@@ -36,6 +36,8 @@ model UserEmpresa {
   numero      Int
   email       String @unique
   senha       String
+  descricao   String? 
+  dono        String?
 
   reservas Reserva[]
 }
